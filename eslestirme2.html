@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eşleştirme oyunu</title>
+    <style>
+        div#oyun-cerceve {
+    display: grid;
+    grid-template-columns: 100px 100px 100px 100px;
+    gap: 1rem;
+}
+
+.kart {
+    background-color: transparent;
+    width: 100px;
+    height: 100px;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  
+  .kart-cerceve {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  
+  .kart.acik .kart-cerceve{
+    box-shadow: 0px 0px 7px 0px rgb(220 22 22);
+  }
+
+  .kart.acik .kart-cerceve, .kart.eslesti .kart-cerceve {
+    transform: rotateY(180deg);
+  }
+  
+  .kart-onyuz, .kart-arkayuz {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  .kart-arkayuz {
+    transform: rotateY(180deg);
+  }
+
+  #kutlama{
+    width: 300px; 
+    height: 200px; 
+    background-color: #f0f0f0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    image-orientation: flip;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  #tebrikler{
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+  }
+    </style>
+</head>
+
+<body>
+    <div id="oyun-cerceve"></div>
+    <div id="puan"><strong>Eşleşen kart sayısı:</strong>
+        <span id="puanText"></span>
+    </div>
+
+    <script>
+            function rastgeleFotoNumaralari() {
+    const numaralar = [];
+    const kullanilanNumaralar = new Set();
+
+    while (numaralar.length < 8) {
+        const rastgeleNumara = Math.floor(Math.random() * 99) + 1;
+
+        if (!kullanilanNumaralar.has(rastgeleNumara)) {
+            kullanilanNumaralar.add(rastgeleNumara);
+            numaralar.push(rastgeleNumara, rastgeleNumara);
+        }
+    }
+
+    return numaralar;
+}
+
+
+const fotoNumaralariii = rastgeleFotoNumaralari();
+
+
+
+
+
+
+
+
+
+
+
+
+
+        let puanText = document.getElementById('puanText');
+let puan = 0;
+
+const fotoNumaralari = [10, 20, 30, 20, 10, 40, 40, 30];
+
+const kartTemplate = `
+    <div class="kart-cerceve">
+        <div class="kart-onyuz">
+            <img src="https://via.placeholder.com/100x100?text=?">
+        </div>
+
+        <div class="kart-arkayuz">
+            <img src="">
+        </div>
+    </div>
+`;
+
+// ... (CSS ve HTML kodları)
+
+function kutlamaGoster() {
+    const kutlamaDiv = document.createElement("div");
+    kutlamaDiv.innerHTML = `
+        <div id="kutlama">
+        <h1 id='tebrikler'> tebrikler   </h1>
+
+            <img src="https://lipsum.app/id/${fotoNumara}/300x200" alt="Kutlama">
+        </div>
+    `;
+    document.body.appendChild(kutlamaDiv);
+    setTimeout(() => {
+        document.body.removeChild(kutlamaDiv);
+    }, 5000);
+}
+
+for (fotoNumara of fotoNumaralari) {
+    const yenikart = document.createElement("div");
+    yenikart.innerHTML = kartTemplate;
+    yenikart.classList.add("kart");
+    yenikart.querySelector(".kart-arkayuz img").src = `https://lipsum.app/id/${fotoNumara}/100x100`;
+    document.querySelector("div#oyun-cerceve").append(yenikart);
+
+    yenikart.addEventListener("click", kartTiklama);
+}
+
+function kartTiklama(olay) {
+    const secilenKart = olay.currentTarget;
+
+    if (secilenKart.classList.contains("eslesti")) {
+        return;
+    }
+
+    if (secilenKart.classList.contains("acik")) {
+        return;
+    }
+
+    const tumAcikKartlar = document.querySelectorAll(".acik");
+    if (tumAcikKartlar.length === 2) {
+        return;
+    }
+
+    const acikKart = document.querySelector(".acik");
+
+    if (acikKart === null) {
+        secilenKart.classList.add("acik");
+
+        setTimeout(() => {
+            secilenKart.classList.remove("acik");
+        }, 1500);
+        return;
+    }
+
+    secilenKart.classList.add("acik");
+
+    const acikKartImg = acikKart.querySelector(".kart-arkayuz img");
+    const secilenKartImg = secilenKart.querySelector(".kart-arkayuz img");
+
+    if (acikKartImg.src === secilenKartImg.src) {
+        acikKart.classList.add("eslesti");
+        secilenKart.classList.add("eslesti");
+
+        puan++;
+
+        puanText.innerHTML = puan;
+
+        if (puan === 4) {
+            kutlamaGoster();
+        }
+
+        acikKart.classList.remove("acik");
+        secilenKart.classList.remove("acik");
+
+        setTimeout(() => {
+            acikKart.removeEventListener("click", kartTiklama);
+            secilenKart.removeEventListener("click", kartTiklama);
+        }, 1000);
+    } else {
+        setTimeout(() => {
+            acikKart.classList.remove("acik");
+            secilenKart.classList.remove("acik");
+        }, 1500);
+    }
+}
+
+    </script>
+</body>
+
+</html>
